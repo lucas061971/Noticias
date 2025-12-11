@@ -1,0 +1,5 @@
+admin;1111; lucasmediaroble@gmail.com; ADMIN
+usuario1; 1112; usuario1@gmail.com; USUARIO
+usuario2; 1113; usuario3@gmail.com; USUARIO
+usuario3; 1114; usuario4@gmail.com USUARIO
+
