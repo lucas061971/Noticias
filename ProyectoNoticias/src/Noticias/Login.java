@@ -106,28 +106,24 @@ public class Login {
 		
 		// Listener del botón para validar login
 		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String usuario = textField.getText();
-				String contraseña = new String(passwordField.getPassword());
+		    public void actionPerformed(ActionEvent e) {
+		        String usuario = textField.getText();
+		        String contraseña = new String(passwordField.getPassword());
 
-				String tipo = validarUsuario(usuario, contraseña);
+		        String tipo = validarUsuario(usuario, contraseña);
 
-				if (tipo == null) {
-					// Usuario o contraseña incorrectos
-					JOptionPane.showMessageDialog(frame, "Usuario o contraseña incorrectos");
-				} else if (tipo.equals("usuario")) {
-					// Abrir clase para usuario
-					PanelUsuario usuarioWindow = new PanelUsuario();
-					usuarioWindow.setVisible(true);
-					frame.dispose(); // cerrar login
-				} else if (tipo.equals("admin")) {
-					// Abrir clase para admin
-					PanelAdmin adminWindow = new PanelAdmin();
-					adminWindow.setVisible(true);
-					frame.dispose(); // cerrar login
-				}
-			}
+		        if (tipo == null) {
+		            JOptionPane.showMessageDialog(frame, "Usuario o contraseña incorrectos");
+		        } else if (tipo.equals("usuario")) {
+		            new PanelUsuario();    // ABRE LA CLASE Usuario
+		            frame.dispose();  // Cierra el login
+		        } else if (tipo.equals("admin")) {
+		            new PanelAdmin();      // ABRE LA CLASE Admin
+		            frame.dispose();
+		        }
+		    }
 		});
+
 	}
 	
 	/**
@@ -140,25 +136,24 @@ public class Login {
 	    try (BufferedReader br = new BufferedReader(new FileReader("usuarios.txt"))) {
 	        String linea;
 	        while ((linea = br.readLine()) != null) {
-	            String[] datos = linea.split(",");
-	            if (datos.length == 3) {
-	                String nombre = datos[0];
-	                String contraseña = datos[1];
-	                String tipo = datos[2];
-	                
-	                if (nombre.equals(user) && contraseña.equals(pass)) {
-	                    return tipo;  // devuelve "usuario" o "admin"
-	                }
+
+	            String[] datos = linea.split(";");
+	            if (datos.length < 4) continue;
+
+	            String nombre = datos[0].trim();
+	            String contraseña = datos[1].trim();
+	            String tipo = datos[3].trim().toLowerCase();
+
+	            if (nombre.equals(user) && contraseña.equals(pass)) {
+	                return tipo; // "admin" o "usuario"
 	            }
 	        }
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }
-	    return null; // No encontró usuario
+	    return null;
 	}
+
 	
-	public void inciarSesion() {
-		// Puedes implementar lógica adicional si quieres
-	}
 }
 

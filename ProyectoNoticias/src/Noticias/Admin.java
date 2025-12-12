@@ -1,5 +1,5 @@
 package Noticias;
 
-public class Usuario {
+public class Admin {
 
 }
