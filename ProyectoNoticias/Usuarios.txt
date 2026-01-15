@@ -1,5 +1,6 @@
 admin;1111;lucasmediaroble@gmail.com;ADMIN
-usuario1;1112;usuario1@gmail.com;USUARIO
 usuario2;1113;usuario3@gmail.com;USUARIO
 usuario3;1114;usuario4@gmail.com;USUARIO
+https://www.expansion.com,https://www.marca.com,https://www.lavanguardia.com,https://www.bbc.com/news,https://www.3djuegos.com,https://www.fotogramas.es
 
+usuario1;https://www.eleconomista.es,https://www.marca.com,https://www.abc.es,https://www.bbc.com/news,https://www.3djuegos.com,https://www.fotogramas.es

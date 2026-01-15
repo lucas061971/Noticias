@@ -2,20 +2,23 @@ package Noticias;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class PanelUsuario extends JFrame {
 
-    public PanelUsuario() {
+    private String usuario;
+
+    public PanelUsuario(String usuario) {
+        this.usuario = usuario;
+
         setTitle("Panel Usuario");
         setSize(450, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
-        JLabel lblNewLabel = new JLabel("USUARIO :");
+        JLabel lblNewLabel = new JLabel("USUARIO: ");
         lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        lblNewLabel.setBounds(154, 43, 158, 27);
+        lblNewLabel.setBounds(161, 52, 250, 27);
         getContentPane().add(lblNewLabel);
 
         JButton btnConfig = new JButton("Configurar Preferencias");
@@ -33,12 +36,25 @@ public class PanelUsuario extends JFrame {
         btnAtras.setBounds(10, 227, 89, 23);
         getContentPane().add(btnAtras);
 
-        // Mostrar la ventana
+     
+        btnConfig.addActionListener(e -> {
+            PrefenciasUsuario ventana = new PrefenciasUsuario(usuario);
+            ventana.setVisible(true);
+        });
+
+    
+        btnNoticias.addActionListener(e -> {
+            new PanelNoticias(usuario);
+        });
+        btnAtras.addActionListener(e -> {
+            dispose();
+            new Login();
+        });
+
         setVisible(true);
     }
 
     public static void main(String[] args) {
-        new PanelUsuario();
+        new PanelUsuario("UsuarioDemo");
     }
 }
-

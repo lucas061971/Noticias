@@ -77,7 +77,7 @@ public class Login {
 		
 		passwordField = new JPasswordField(); 
 		passwordField.setBounds(175, 125, 86, 26);
-		passwordField.setEchoChar('•');  // <-- Contraseña con puntos
+		passwordField.setEchoChar('•'); 
 		frame.getContentPane().add(passwordField);
 		
 		btnNewButton = new JButton("Siguiente");
@@ -89,22 +89,21 @@ public class Login {
 		chckbxNewCheckBox.setBounds(266, 127, 158, 23);
 		frame.getContentPane().add(chckbxNewCheckBox);
 		
-		// Guardamos el caracter original para ocultar la contraseña
+		
 		final char defaultEchoChar = passwordField.getEchoChar();
 		
 		chckbxNewCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxNewCheckBox.isSelected()) {
-					// Mostrar la contraseña
+					
 					passwordField.setEchoChar((char)0);
 				} else {
-					// Ocultar la contraseña con puntos
+					
 					passwordField.setEchoChar(defaultEchoChar);
 				}
 			}
 		});
 		
-		// Listener del botón para validar login
 		btnNewButton.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
 		        String usuario = textField.getText();
@@ -115,10 +114,10 @@ public class Login {
 		        if (tipo == null) {
 		            JOptionPane.showMessageDialog(frame, "Usuario o contraseña incorrectos");
 		        } else if (tipo.equals("usuario")) {
-		            new PanelUsuario();    // ABRE LA CLASE Usuario
-		            frame.dispose();  // Cierra el login
+		            new PanelUsuario(usuario); 
+		            frame.dispose();
 		        } else if (tipo.equals("admin")) {
-		            new PanelAdmin();      // ABRE LA CLASE Admin
+		            new PanelAdmin(); 
 		            frame.dispose();
 		        }
 		    }
@@ -126,14 +125,8 @@ public class Login {
 
 	}
 	
-	/**
-	 * Método que valida el usuario en el archivo usuarios.txt
-	 * @param user nombre de usuario
-	 * @param pass contraseña
-	 * @return "usuario", "admin" o null si no existe
-	 */
 	public String validarUsuario(String user, String pass) {
-	    try (BufferedReader br = new BufferedReader(new FileReader("usuarios.txt"))) {
+	    try (BufferedReader br = new BufferedReader(new FileReader("Usuarios.txt"))) {
 	        String linea;
 	        while ((linea = br.readLine()) != null) {
 
@@ -145,7 +138,7 @@ public class Login {
 	            String tipo = datos[3].trim().toLowerCase();
 
 	            if (nombre.equals(user) && contraseña.equals(pass)) {
-	                return tipo; // "admin" o "usuario"
+	                return tipo; 
 	            }
 	        }
 	    } catch (IOException e) {
@@ -155,5 +148,4 @@ public class Login {
 	}
 
 	
-}
-
+}//kfva elns vsyb vqjp

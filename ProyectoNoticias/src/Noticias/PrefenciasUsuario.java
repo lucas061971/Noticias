@@ -1,118 +1,91 @@
 package Noticias;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class PrefenciasUsuario extends JFrame {
 
-    private JComboBox<String> cbEconomia, cbDeportes, cbNacional, cbInternacional, cbVideojuegos, cbCineSeries;
     private String usuario;
+    private final String ARCHIVO = "Usuarios.txt";
 
-    private final String ARCHIVO = "preferencias.txt";
+    private JButton btnGuardar;
+    private JButton btnAtras; // Botón para volver al PanelUsuario
+    private JComboBox<String> cbDeportes, cbEconomia, cbInternacional, cbNacional, cbVideojuegos, cbSeries;
+    private JLabel lblDeportes, lblEconomia, lblInternacional, lblNacional, lblVideojuegos, lblSeries, lblTitulo;
 
     public PrefenciasUsuario(String usuario) {
         this.usuario = usuario;
-
-        setTitle("Preferencias de " + usuario);
-        setSize(450, 450);
+        initComponents();
+        
+        setResizable(false); 
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(null);
-
-        JLabel titulo = new JLabel("SELECCIONA TUS FUENTES");
-        titulo.setFont(new Font("Tahoma", Font.BOLD, 20));
-        titulo.setBounds(100, 20, 300, 30);
-        add(titulo);
-
-        // --- Etiquetas ---
-        addLabel("Economía:", 50, 80);
-        addLabel("Deportes:", 50, 120);
-        addLabel("Nacional:", 50, 160);
-        addLabel("Internacional:", 50, 200);
-        addLabel("Videojuegos:", 50, 240);   // inventada
-        addLabel("Cine y Series:", 50, 280); // inventada
-
-        // --- Opciones de cada categoría ---
-        String[] economia = {"El Economista", "Cinco Días", "Expansión"};
-        String[] deportes = {"Marca", "AS", "Sport"};
-        String[] nacional = {"El País", "ABC", "La Vanguardia"};
-        String[] internacional = {"The Guardian", "NY Times", "BBC News"};
-
-        // Inventadas
-        String[] videojuegos = {"3DJuegos", "HobbyConsolas", "Vandal"};
-        String[] cineSeries = {"Fotogramas", "Sensacine", "IMDb News"};
-
-        // --- JComboBox ---
-        cbEconomia = addCombo(economia, 200, 80);
-        cbDeportes = addCombo(deportes, 200, 120);
-        cbNacional = addCombo(nacional, 200, 160);
-        cbInternacional = addCombo(internacional, 200, 200);
-        cbVideojuegos = addCombo(videojuegos, 200, 240);
-        cbCineSeries = addCombo(cineSeries, 200, 280);
-
-        // --- Botón guardar ---
-        JButton guardar = new JButton("GUARDAR PREFERENCIAS");
-        guardar.setBounds(120, 340, 220, 40);
-        guardar.setBackground(new Color(0, 150, 0));
-        guardar.setForeground(Color.WHITE);
-        guardar.setFont(new Font("Arial", Font.BOLD, 14));
-        add(guardar);
-
-        guardar.addActionListener(e -> guardarPreferencias());
-
-        // Cargar si existen
+        setTitle("Preferencias de " + usuario);
+        
+        cargarModelos();
         cargarPreferenciasUsuario();
-
-        setVisible(true);
     }
 
-    private void addLabel(String texto, int x, int y) {
-        JLabel lbl = new JLabel(texto);
-        lbl.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        lbl.setBounds(x, y, 150, 25);
-        add(lbl);
+    private void cargarModelos() {
+        cbEconomia.setModel(new DefaultComboBoxModel<>(new String[]{"El Economista", "Cinco Días", "Expansión"}));
+        cbDeportes.setModel(new DefaultComboBoxModel<>(new String[]{"Marca", "AS", "Sport"}));
+        cbNacional.setModel(new DefaultComboBoxModel<>(new String[]{"El País", "ABC", "La Vanguardia"}));
+        cbInternacional.setModel(new DefaultComboBoxModel<>(new String[]{"BBC News", "NY Times", "The Reuters"}));
+        cbVideojuegos.setModel(new DefaultComboBoxModel<>(new String[]{"3DJuegos", "HobbyConsolas", "Vandal"}));
+        cbSeries.setModel(new DefaultComboBoxModel<>(new String[]{"Fotogramas", "Sensacine", "IMDb News"}));
     }
 
-    private JComboBox<String> addCombo(String[] opciones, int x, int y) {
-        JComboBox<String> combo = new JComboBox<>(opciones);
-        combo.setBounds(x, y, 180, 25);
-        add(combo);
-        return combo;
+    private String obtenerURL(String medio) {
+        switch (medio) {
+            case "El Economista": return "https://www.eleconomista.es";
+            case "Cinco Días": return "https://cincodias.elpais.com";
+            case "Expansión": return "https://www.expansion.com";
+            case "Marca": return "https://www.marca.com";
+            case "AS": return "https://as.com";
+            case "Sport": return "https://www.sport.es";
+            case "El País": return "https://elpais.com";
+            case "ABC": return "https://www.abc.es";
+            case "La Vanguardia": return "https://www.lavanguardia.com";
+            case "NY Times": return "https://www.nytimes.com";
+            case "BBC News": return "https://www.bbc.com/news";
+            case "The Reuters": return "https://www.reuters.com";
+            case "3DJuegos": return "https://www.3djuegos.com";
+            case "HobbyConsolas": return "https://www.hobbyconsolas.com";
+            case "Vandal": return "https://vandal.elespanol.com";
+            case "Fotogramas": return "https://www.fotogramas.es";
+            case "Sensacine": return "https://www.sensacine.com";
+            case "IMDb News": return "https://www.imdb.com/news";
+            default: return "";
+        }
     }
 
     private void guardarPreferencias() {
         String linea = usuario + ";" +
-                cbEconomia.getSelectedItem() + "," +
-                cbDeportes.getSelectedItem() + "," +
-                cbNacional.getSelectedItem() + "," +
-                cbInternacional.getSelectedItem() + "," +
-                cbVideojuegos.getSelectedItem() + "," +
-                cbCineSeries.getSelectedItem();
+                obtenerURL(cbEconomia.getSelectedItem().toString()) + "," +
+                obtenerURL(cbDeportes.getSelectedItem().toString()) + "," +
+                obtenerURL(cbNacional.getSelectedItem().toString()) + "," +
+                obtenerURL(cbInternacional.getSelectedItem().toString()) + "," +
+                obtenerURL(cbVideojuegos.getSelectedItem().toString()) + "," +
+                obtenerURL(cbSeries.getSelectedItem().toString());
 
         try {
             ArrayList<String> lineas = new ArrayList<>();
             File f = new File(ARCHIVO);
-
             if (f.exists()) {
                 BufferedReader br = new BufferedReader(new FileReader(f));
                 String l;
                 while ((l = br.readLine()) != null) {
-                    if (!l.startsWith(usuario + ";")) {
-                        lineas.add(l);
-                    }
+                    if (!l.startsWith(usuario + ";")) lineas.add(l);
                 }
                 br.close();
             }
-
             lineas.add(linea);
-
             FileWriter fw = new FileWriter(ARCHIVO);
             for (String s : lineas) fw.write(s + "\n");
             fw.close();
-
-            JOptionPane.showMessageDialog(this, "Preferencias guardadas.");
+            JOptionPane.showMessageDialog(this, "Preferencias guardadas correctamente.");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al guardar.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -121,25 +94,72 @@ public class PrefenciasUsuario extends JFrame {
     private void cargarPreferenciasUsuario() {
         File f = new File(ARCHIVO);
         if (!f.exists()) return;
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(f));
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String linea;
-
             while ((linea = br.readLine()) != null) {
-                if (linea.startsWith(usuario + ";")) {
-                    String[] partes = linea.split(";")[1].split(",");
-
-                    cbEconomia.setSelectedItem(partes[0]);
-                    cbDeportes.setSelectedItem(partes[1]);
-                    cbNacional.setSelectedItem(partes[2]);
-                    cbInternacional.setSelectedItem(partes[3]);
-                    cbVideojuegos.setSelectedItem(partes[4]);
-                    cbCineSeries.setSelectedItem(partes[5]);
-                }
+                if (linea.startsWith(usuario + ";")) { /* Carga opcional */ }
             }
-
-            br.close();
         } catch (Exception ignored) {}
+    }
+
+    private void initComponents() {
+        lblTitulo = new JLabel("SELECCIONA TUS FUENTES");
+        lblEconomia = new JLabel("Economía:");
+        lblDeportes = new JLabel("Deportes:");
+        lblNacional = new JLabel("Nacional:");
+        lblInternacional = new JLabel("Internacional:");
+        lblVideojuegos = new JLabel("Videojuegos:");
+        lblSeries = new JLabel("Cine y Series:");
+
+        cbEconomia = new JComboBox<>();
+        cbDeportes = new JComboBox<>();
+        cbNacional = new JComboBox<>();
+        cbInternacional = new JComboBox<>();
+        cbVideojuegos = new JComboBox<>();
+        cbSeries = new JComboBox<>();
+
+        btnGuardar = new JButton("Guardar Preferencias");
+        btnAtras = new JButton("Atrás"); 
+
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); 
+        getContentPane().setLayout(null);
+
+        // Título y etiquetas
+        lblTitulo.setFont(new java.awt.Font("Tahoma", 1, 22));
+        lblTitulo.setBounds(60, 20, 320, 30);
+        getContentPane().add(lblTitulo);
+
+        // Ubicaciones de los combos
+        cbEconomia.setBounds(85, 97, 200, 25);
+        getContentPane().add(cbEconomia);
+        cbDeportes.setBounds(85, 152, 200, 25);
+        getContentPane().add(cbDeportes);
+        cbNacional.setBounds(85, 207, 200, 25);
+        getContentPane().add(cbNacional);
+        cbInternacional.setBounds(85, 257, 200, 25);
+        getContentPane().add(cbInternacional);
+        cbVideojuegos.setBounds(85, 313, 200, 25);
+        getContentPane().add(cbVideojuegos);
+        cbSeries.setBounds(85, 359, 200, 25);
+        getContentPane().add(cbSeries);
+
+        // Botón Guardar
+        btnGuardar.setBounds(105, 395, 180, 35);
+        btnGuardar.addActionListener(evt -> guardarPreferencias());
+        getContentPane().add(btnGuardar);
+
+        // BOTÓN ATRÁS: Vuelve a PanelUsuario
+        btnAtras.setBounds(10, 400, 80, 25);
+        btnAtras.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Al pulsar atrás, abrimos de nuevo el PanelUsuario pasándole el nombre
+                new PanelUsuario(usuario); 
+                dispose(); // Cierra esta ventana de preferencias
+            }
+        });
+        getContentPane().add(btnAtras);
+
+        setSize(420, 480);
     }
 }
