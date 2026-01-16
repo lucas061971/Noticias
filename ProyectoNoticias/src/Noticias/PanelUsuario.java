@@ -2,6 +2,7 @@ package Noticias;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 
 public class PanelUsuario extends JFrame {
 
@@ -10,51 +11,71 @@ public class PanelUsuario extends JFrame {
     public PanelUsuario(String usuario) {
         this.usuario = usuario;
 
-        setTitle("Panel Usuario");
-        setSize(450, 300);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        getContentPane().setLayout(null);
+        // Configuración de la ventana
+        this.setTitle("Menú de Usuario - " + usuario);
+        this.setSize(450, 350); // Aumentamos un poco el alto para el botón extra
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.getContentPane().setLayout(null);
 
-        JLabel lblNewLabel = new JLabel("USUARIO: ");
-        lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        lblNewLabel.setBounds(161, 52, 250, 27);
-        getContentPane().add(lblNewLabel);
+        JLabel lbl = new JLabel("SESIÓN: " + usuario.toUpperCase());
+        lbl.setFont(new Font("Tahoma", Font.BOLD, 18));
+        lbl.setBounds(10, 30, 414, 30);
+        lbl.setHorizontalAlignment(SwingConstants.CENTER);
+        this.getContentPane().add(lbl);
 
+        // Botón Configurar
         JButton btnConfig = new JButton("Configurar Preferencias");
-        btnConfig.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        btnConfig.setBounds(25, 140, 183, 45);
-        getContentPane().add(btnConfig);
+        btnConfig.setBounds(25, 110, 183, 45);
+        if (comprobarPreferencias(usuario)) {
+            btnConfig.setEnabled(false);
+            btnConfig.setText("Configurado");
+        }
+        this.getContentPane().add(btnConfig);
 
-        JButton btnNoticias = new JButton("Ver noticias");
-        btnNoticias.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        btnNoticias.setBounds(218, 140, 190, 45);
-        getContentPane().add(btnNoticias);
+        // Botón Ver Noticias
+        JButton btnNoticias = new JButton("Ver Noticias");
+        btnNoticias.setBounds(218, 110, 190, 45);
+        this.getContentPane().add(btnNoticias);
 
-        JButton btnAtras = new JButton("ATRÁS");
-        btnAtras.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        btnAtras.setBounds(10, 227, 89, 23);
-        getContentPane().add(btnAtras);
+        // --- BOTÓN ATRÁS (NUEVO) ---
+        JButton btnAtras = new JButton("Atrás");
+        btnAtras.setBounds(10, 270, 100, 25);
+        this.getContentPane().add(btnAtras);
 
-     
+        // --- ACCIONES ---
+
         btnConfig.addActionListener(e -> {
-            PrefenciasUsuario ventana = new PrefenciasUsuario(usuario);
-            ventana.setVisible(true);
+            new PrefenciasUsuario(usuario).setVisible(true);
+            this.dispose();
         });
 
-    
         btnNoticias.addActionListener(e -> {
-            new PanelNoticias(usuario);
-        });
-        btnAtras.addActionListener(e -> {
-            dispose();
-            new Login();
+            new PanelNoticias(usuario); 
+            this.dispose();
         });
 
-        setVisible(true);
+        // Acción del botón Atrás: vuelve al Login
+        btnAtras.addActionListener(e -> {
+            new Login(); // Esto abrirá la ventana de Login
+            this.dispose(); // Cierra el panel de usuario
+        });
+
+        this.setVisible(true); 
     }
 
-    public static void main(String[] args) {
-        new PanelUsuario("UsuarioDemo");
+    private boolean comprobarPreferencias(String user) {
+        File f = new File("Usuarios.txt");
+        if (!f.exists()) return false;
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(";");
+                if (partes[0].equalsIgnoreCase(user) && partes.length >= 5) {
+                    return true; 
+                }
+            }
+        } catch (Exception e) { return false; }
+        return false;
     }
 }

@@ -1,7 +1,5 @@
 package Noticias;
 
-import Noticias.GestorNoticias;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -11,58 +9,82 @@ public class PanelNoticias extends JFrame {
 
     private JTextArea areaNoticias;
     private String usuario;
+    private String urlsDirectas;
 
+    // Constructor para ADMIN
+    public PanelNoticias(String usuario, String urls) {
+        this.usuario = usuario;
+        this.urlsDirectas = urls;
+        iniciarVentana();
+        cargarNoticias(true);
+    }
+
+    // Constructor para USUARIO
     public PanelNoticias(String usuario) {
         this.usuario = usuario;
+        this.urlsDirectas = null;
+        iniciarVentana();
+        cargarNoticias(false);
+    }
 
-        setTitle("Noticias en vivo");
-        setSize(650, 420);
+    private void iniciarVentana() {
+        setTitle("Visor de Noticias - " + usuario);
+        setSize(850, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout());
-
+        
         areaNoticias = new JTextArea();
         areaNoticias.setEditable(false);
-        areaNoticias.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        add(new JScrollPane(areaNoticias), BorderLayout.CENTER);
-
-        cargarNoticias();
-
+        areaNoticias.setFont(new Font("Tahoma", Font.PLAIN, 13));
+        areaNoticias.setBackground(Color.WHITE);
+        areaNoticias.setForeground(Color.BLACK);
+        
+        add(new JScrollPane(areaNoticias));
         setVisible(true);
     }
 
-    private void cargarNoticias() {
+    private void cargarNoticias(boolean esAdmin) {
+        areaNoticias.setText("Conectando con los servidores de noticias...\n\n");
+        new Thread(() -> {
+            if (esAdmin) {
+                procesarFuentes(urlsDirectas.split(","));
+            } else {
+                leerPreferenciasDelArchivo();
+            }
+        }).start();
+    }
 
-        areaNoticias.setText("Cargando noticias en vivo...\n\n");
-
+    private void leerPreferenciasDelArchivo() {
         try (BufferedReader br = new BufferedReader(new FileReader("Usuarios.txt"))) {
-
-            String linea;
+            String l;
             boolean encontrado = false;
-
-            while ((linea = br.readLine()) != null) {
-
-                String[] partes = linea.split(";");
-                if (partes.length != 2) continue;
-
-                if (partes[0].trim().equalsIgnoreCase(usuario.trim())) {
-
+            while ((l = br.readLine()) != null) {
+                String[] p = l.split(";");
+                if (p[0].equalsIgnoreCase(usuario) && p.length >= 5) {
+                    procesarFuentes(p[4].split(","));
                     encontrado = true;
-                    String[] urls = partes[1].split(",");
-
-                    for (String url : urls) {
-                        areaNoticias.append("Fuente: " + url + "\n\n");
-                        areaNoticias.append(GestorNoticias.leerTitulares(url));
-                    }
+                    break;
                 }
             }
-
-            if (!encontrado) {
-                areaNoticias.append("No hay preferencias configuradas.\n");
-            }
-
+            if(!encontrado) areaNoticias.append("Por favor, configura tus periódicos en Preferencias.");
         } catch (Exception e) {
-            areaNoticias.append("ERROR al leer Preferencias.txt\n");
+            areaNoticias.append("Error al acceder a tus preferencias.");
+        }
+    }
+
+    private void procesarFuentes(String[] urls) {
+        for (String url : urls) {
+            String urlLimpia = url.trim();
+            if(urlLimpia.isEmpty()) continue;
+
+            areaNoticias.append(">>> " + urlLimpia.toUpperCase() + "\n");
+            
+            // Aquí llamamos al Gestor que tiene el Jsoup
+            String contenido = GestorNoticias.leerTitulares(urlLimpia);
+            
+            areaNoticias.append(contenido + "\n");
+            areaNoticias.append("----------------------------------------------------------\n\n");
+            areaNoticias.setCaretPosition(areaNoticias.getDocument().getLength());
         }
     }
 }
